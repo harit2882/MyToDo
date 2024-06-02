@@ -1,28 +1,32 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
+trigger:
+  branches:
+    include:
       - main
-  workflow_dispatch:
 
-jobs:
-  build:
-    runs-on: windows-latest
+pool:
+  vmImage: 'windows-latest'
 
-    steps:
-      - uses: actions/checkout@v4
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+  
+  - task: Gradle@2
+    inputs:
+      gradleWrapperFile: 'gradlew'
+      options: 'build'
+      publishJUnitResults: true
+      testResultsFiles: '**/TEST-*.xml'
 
-      - name: Set up Java version
-        uses: actions/setup-java@v1
-        with:
-          java-version: '17'
+  - task: CopyFiles@2
+    inputs:
+      contents: 'build/libs/*.jar'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+    displayName: 'Copy Built JAR'
 
-      - name: Build with Gradle
-        run: ./gradlew.bat build
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: kotlin-app
-          path: build/libs/*.jar
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'drop'
+    displayName: 'Publish Artifact'
