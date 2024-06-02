@@ -1,0 +1,31 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+steps:
+  - task: UseJava@1
+    inputs:
+      versionSpec: '11'
+      jdkArchitectureOption: 'x64'
+  - script: |
+      ./gradlew build
+    displayName: 'Build with Gradle'
+
+  - task: CopyFiles@2
+    inputs:
+      contents: 'build/libs/*.jar'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+    displayName: 'Copy Built JAR'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'drop'
+    displayName: 'Publish Artifact'
