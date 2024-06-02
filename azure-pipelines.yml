@@ -7,17 +7,16 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
-  - task: JavaToolInstaller@0
+  - checkout: self
+    clean: true
+
+  - task: UseJava@1
     inputs:
       versionSpec: '17'
       jdkArchitectureOption: 'x64'
   
-  - task: Gradle@2
-    inputs:
-      gradleWrapperFile: 'gradlew'
-      options: 'build'
-      publishJUnitResults: true
-      testResultsFiles: '**/TEST-*.xml'
+  - script: ./gradlew.bat build
+    displayName: 'Build with Gradle'
 
   - task: CopyFiles@2
     inputs:
