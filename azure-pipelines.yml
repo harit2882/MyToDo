@@ -1,29 +1,28 @@
-trigger:
-  branches:
-    include:
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
       - main
+  workflow_dispatch:
 
-pool:
-  vmImage: 'windows-latest'
+jobs:
+  build:
+    runs-on: windows-latest
 
-steps:
-  - task: JavaToolInstaller@0
-    inputs:
-      versionSpec: '11'
-      jdkArchitectureOption: 'x64'
+    steps:
+      - uses: actions/checkout@v4
 
-  - script: |
-      ./gradlew build
-    displayName: 'Build with Gradle'
+      - name: Set up Java version
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
 
-  - task: CopyFiles@2
-    inputs:
-      contents: 'build/libs/*.jar'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-    displayName: 'Copy Built JAR'
+      - name: Build with Gradle
+        run: ./gradlew.bat build
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'drop'
-    displayName: 'Publish Artifact'
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: kotlin-app
+          path: build/libs/*.jar
