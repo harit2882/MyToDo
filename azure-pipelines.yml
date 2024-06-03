@@ -7,7 +7,7 @@ pool:
 jobs:
 - job: BuildAndTest
   steps:
-    - task: UseJava@1
+    - task: JavaToolInstaller@0
       inputs:
         versionSpec: '17'
         jdkArchitectureOption: 'x64'
