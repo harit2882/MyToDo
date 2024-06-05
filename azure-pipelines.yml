@@ -9,6 +9,7 @@ jobs:
   steps:
     - task: JavaToolInstaller@0
       inputs:
+        jdkSourceOption: 'MicrosoftHosted'
         versionSpec: '17'
         jdkArchitectureOption: 'x64'
     - script: |
