@@ -4,9 +4,6 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
-variables:
-  JAVA_HOME: '$(JAVA_HOME_17_X64)'
-
 stages:
   - stage: Build
     jobs:
@@ -15,10 +12,9 @@ stages:
         steps:
           - task: JavaToolInstaller@0
             inputs:
-              jdkVersionOption: '1.17'
+              versionSpec: '17'
               jdkArchitectureOption: 'x64'
               jdkSourceOption: 'MicrosoftHosted'
-              cleanDestinationDirectory: true
 
           - script: |
               ./gradlew.bat build
