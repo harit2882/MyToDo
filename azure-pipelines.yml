@@ -4,24 +4,27 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
-jobs:
-- job: BuildAndTest
-  steps:
-    - task: JavaToolInstaller@0
-      inputs:
-        jdkSourceOption: 'MicrosoftHosted'
-        versionSpec: '17'
-        jdkArchitectureOption: 'x64'
-    - script: |
-        ./gradlew build
-      displayName: 'Build with Gradle'
-    - task: CopyFiles@2
-      inputs:
-        contents: 'build/libs/*.jar'
-        targetFolder: '$(Build.ArtifactStagingDirectory)'
-      displayName: 'Copy Built JAR'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: 'drop'
-      displayName: 'Publish Artifact'
+variables:
+  JAVA_HOME: '$(JAVA_HOME_17_X64)'
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        displayName: 'Build the project'
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              jdkVersionOption: '1.17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'MicrosoftHosted'
+              cleanDestinationDirectory: true
+
+          - script: |
+              ./gradlew.bat build
+            displayName: 'Build with Gradle'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'build/libs/*.jar'
+              artifactName: 'kotlin-app'
